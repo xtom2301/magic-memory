@@ -16,6 +16,7 @@ const App = () => {
   const [turns, setTurns] = useState(0);
   const [choiceOne, setChoiceOne] = useState(null);
   const [choiceTwo, setChoiceTwo] = useState(null);
+  const [disabled, setDisabled] = useState(false);
 
   const shuffle = () => {
     const shuffledCards = [...cardImages, ...cardImages]
@@ -23,6 +24,8 @@ const App = () => {
       .map((card) => ({ ...card, id: Math.random() }));
 
     setCards(shuffledCards);
+    setChoiceOne();
+    setChoiceTwo();
     setTurns(0);
   };
 
@@ -34,10 +37,12 @@ const App = () => {
     setChoiceOne(null);
     setChoiceTwo(null);
     setTurns((prevTurn) => prevTurn + 1);
+    setDisabled(false);
   };
 
   useEffect(() => {
     if (choiceOne && choiceTwo) {
+      setDisabled(true);
       if (choiceOne.src === choiceTwo.src) {
         setCards((prevCards) => {
           return prevCards.map((card) => {
@@ -55,10 +60,15 @@ const App = () => {
     }
   }, [choiceOne, choiceTwo]);
 
+  useEffect(() => {
+    shuffle();
+  }, []);
+
   return (
     <div className='App'>
       <h1>Magic Match</h1>
       <button onClick={shuffle}>New Game</button>
+      <p>Turns: {turns}</p>
       <div className='card-grid'>
         {cards.map((card) => (
           <SingleCard
@@ -66,6 +76,7 @@ const App = () => {
             card={card}
             handleChoice={handleChoice}
             flipped={card === choiceOne || card === choiceTwo || card.matched}
+            disabled={disabled}
           />
         ))}
       </div>
